@@ -9,7 +9,7 @@ plt.style.use('seaborn-bright')
 # ignore warnings from bad mech file
 warnings.filterwarnings("ignore")
 
-T_0 = 1000.0  # inlet temperature [K]
+T_0 = 1500.0  # inlet temperature [K]
 pressure = ct.one_atm  # constant pressure [Pa]
 phi = 1
 composition_0 = {'CH4': phi, 'O2': 2 / phi, 'N2': 2 * 3.76 / phi}
@@ -20,8 +20,7 @@ area = 1.e-4  # cross-sectional area [m**2]
 # input file containing the reaction mechanism
 reaction_mechanism = os.path.join('data', 'ucsdmech.yaml')
 
-# Resolution: The PFR will be simulated by 'n_steps' time steps or by a chain
-# of 'n_steps' stirred reactors.
+# Resolution: The PFR will be simulated by 'n_steps' time steps
 n_steps = 80000
 
 gas1 = ct.Solution(reaction_mechanism)
@@ -50,16 +49,37 @@ for n1, t_i in enumerate(t1):
     states1.append(r1.thermo.state)
 
 plt.figure()
-plt.plot(t1, states1.T, label='Lagrangian Particle')
+plt.plot(t1, states1.T, label='Temperature')
 plt.xlabel('$t$ [s]')
 plt.ylabel('$T$ [K]')
+plt.title('Temperature with Respect to Time')
 plt.legend(loc=0)
-plt.show()
+plt.show(block=False)
 
 plt.figure()
-plt.plot(t1, states1.X[:, gas1.species_index('CH4')],
-         label='Lagrangian Particle')
+plt.plot(t1, states1.X[:, gas1.species_index('H2O')], 'g-',
+         label='H2O')
+plt.plot(t1, states1.X[:, gas1.species_index('CH4')], 'r-',
+         label='CH4')
+plt.plot(t1, states1.X[:, gas1.species_index('CO2')], 'b-',
+         label='CO2')
+plt.plot(t1, states1.X[:, gas1.species_index('O2')], 'm-',
+         label='O2')
+plt.title('Major Species Concentrations with Respect to Time')
 plt.xlabel('$t$ [s]')
-plt.ylabel('$X_{H_2}$ [-]')
+plt.ylabel('$X$ [-]')
+plt.legend(loc=0)
+plt.show(block=False)
+
+plt.figure()
+plt.plot(t1, states1.X[:, gas1.species_index('H')], 'r-',
+         label='H')
+plt.plot(t1, states1.X[:, gas1.species_index('OH')], 'b-',
+         label='OH')
+plt.plot(t1, states1.X[:, gas1.species_index('O')], 'm-',
+         label='O')
+plt.title('Minor Species Concentrations with Respect to Time')
+plt.xlabel('$t$ [s]')
+plt.ylabel('$X$ [-]')
 plt.legend(loc=0)
 plt.show()
