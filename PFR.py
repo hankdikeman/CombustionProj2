@@ -9,7 +9,7 @@ plt.style.use('seaborn-bright')
 # ignore warnings from bad mech file
 warnings.filterwarnings("ignore")
 
-T_0 = 1500.0  # inlet temperature [K]
+T_0 = 1000.0  # inlet temperature [K]
 pressure = ct.one_atm  # constant pressure [Pa]
 phi = 1
 composition_0 = {'CH4': phi, 'O2': 2 / phi, 'N2': 2 * 3.76 / phi}
