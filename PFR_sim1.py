@@ -6,80 +6,75 @@ import warnings
 
 plt.style.use('seaborn-bright')
 
+# constant values
+MAX_TIME = 1
+reaction_mechanism = os.path.join('data', 'ucsdmech.yaml')
+# plot colors must be same length as phi!!!
+plotcolors = ["red", "blue", "green", "orange"]
+
 # ignore warnings from bad mech file
 warnings.filterwarnings("ignore")
 
-T_0 = 1000.0  # inlet temperature [K]
-pressure = ct.one_atm  # constant pressure [Pa]
-phi = 1
-composition_0 = {'CH4': phi, 'O2': 2 / phi, 'N2': 2 * 3.76 / phi}
-length = 0.001  # *approximate* PFR length [m]
-u_0 = 0.001  # inflow velocity [m/s]
-area = 1.e-4  # cross-sectional area [m**2]
+init_temps = np.array([1100, 1200, 1300, 1400, 1500])
+init_pressure = np.array([1, 5, 10])
+init_phi = np.array([0.3, 0.5, 1, 1.5])
 
-# input file containing the reaction mechanism
-reaction_mechanism = os.path.join('data', 'ucsdmech.yaml')
+# store ignition times
+ignition_times = np.empty(np.shape(init_temps)[0] * np.shape(init_phi)[0])
 
-# Resolution: The PFR will be simulated by 'n_steps' time steps
-n_steps = 80000
+for pressure in init_pressure:
+    ignition_times = np.empty((np.shape(init_temps)[0], np.shape(init_phi)[0]))
+    equiv_ratios = np.zeros_like(ignition_times)
+    initial_temperatures = np.zeros_like(ignition_times)
+    phi_count = 0
+    for n_phi, phi in enumerate(init_phi):
+        temp_count = 0
+        for n_temp, T_0 in enumerate(init_temps):
+            # describe composition of mixture
+            composition_0 = {'CH4': phi, 'O2': 2 / phi, 'N2': 2 * 3.76 / phi}
 
-gas1 = ct.Solution(reaction_mechanism)
-gas1.TPX = T_0, pressure, composition_0
-mass_flow_rate1 = u_0 * gas1.density * area
+            # Resolution: The PFR will be simulated by 'n_steps' time steps
+            n_steps = int(200000 * phi)
 
-# create a new reactor
-r1 = ct.IdealGasConstPressureReactor(gas1)
-# create a reactor network for performing time integration
-sim1 = ct.ReactorNet([r1])
+            # generate gas solution and set initial conditions
+            gas1 = ct.Solution(reaction_mechanism)
+            gas1.TPX = T_0, pressure * ct.one_atm, composition_0
 
-# approximate a time step to achieve a similar resolution as in the next method
-t_total = length / u_0
-dt = t_total / n_steps
-# define time, space, and other information vectors
-t1 = (np.arange(n_steps) + 1) * dt
-z1 = np.zeros_like(t1)
-u1 = np.zeros_like(t1)
-states1 = ct.SolutionArray(r1.thermo)
-for n1, t_i in enumerate(t1):
-    # perform time integration
-    sim1.advance(t_i)
-    # compute velocity and transform into space
-    u1[n1] = mass_flow_rate1 / area / r1.thermo.density
-    z1[n1] = z1[n1 - 1] + u1[n1] * dt
-    states1.append(r1.thermo.state)
+            # create a new reactor
+            r1 = ct.IdealGasConstPressureReactor(gas1)
+            # create a reactor network for performing time integration
+            sim1 = ct.ReactorNet([r1])
 
-plt.figure()
-plt.plot(t1, states1.T, label='Temperature')
-plt.xlabel('$t$ [s]')
-plt.ylabel('$T$ [K]')
-plt.title('Temperature with Respect to Time')
-plt.legend(loc=0)
-plt.show(block=False)
+            # approximate a time step to achieve a similar resolution as in the next method
+            dt = MAX_TIME / n_steps
+            # define timesteps
+            timesteps = (np.arange(n_steps) + 1) * dt
+            for t_i in timesteps:
+                # perform time integration
+                sim1.advance(t_i)
+                # store current time
+                sim_time = t_i
+                # compute velocity and transform into space
+                # print(r1.thermo.state.T[0])
+                if(r1.thermo.state.T[0] > T_0 + 400):
+                    break
 
-plt.figure()
-plt.plot(t1, states1.X[:, gas1.species_index('H2O')], 'g-',
-         label='H2O')
-plt.plot(t1, states1.X[:, gas1.species_index('CH4')], 'r-',
-         label='CH4')
-plt.plot(t1, states1.X[:, gas1.species_index('CO2')], 'b-',
-         label='CO2')
-plt.plot(t1, states1.X[:, gas1.species_index('O2')], 'm-',
-         label='O2')
-plt.title('Major Species Concentrations with Respect to Time')
-plt.xlabel('$t$ [s]')
-plt.ylabel('$X$ [-]')
-plt.legend(loc=0)
-plt.show(block=False)
-
-plt.figure()
-plt.plot(t1, states1.X[:, gas1.species_index('H')], 'r-',
-         label='H')
-plt.plot(t1, states1.X[:, gas1.species_index('OH')], 'b-',
-         label='OH')
-plt.plot(t1, states1.X[:, gas1.species_index('O')], 'm-',
-         label='O')
-plt.title('Minor Species Concentrations with Respect to Time')
-plt.xlabel('$t$ [s]')
-plt.ylabel('$X$ [-]')
-plt.legend(loc=0)
-plt.show()
+            # assign temps and equiv ratios to condition matrix
+            initial_temperatures[n_temp, n_phi] = T_0
+            equiv_ratios[n_temp, n_phi] = phi
+            ignition_times[n_temp, n_phi] = sim_time
+            temp_count += 1
+        phi_count += 1
+    # plot results at the given pressure
+    plt.figure()
+    for n, phi in enumerate(init_phi):
+        plt.plot(initial_temperatures[:, n], ignition_times[:, n], 'o-', color=plotcolors[n],
+                 label='phi=' + str(phi))
+    plt.title('Auto-Ignition Times at P = ' + str(pressure) + ' atm')
+    plt.xlabel('$T$ [K]')
+    plt.ylabel('$t$ [s]')
+    plt.yscale('log')
+    plt.ylim(0.9E-4, 1.5E0)
+    plt.legend(loc=0)
+    plt.grid(True, axis='y')
+    plt.show()
