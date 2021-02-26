@@ -1,3 +1,9 @@
+"""
+This program evaluates ignition delay for a variety of equivalence ratios, starting
+temperatures, and pressures. These ignition times are then plotted against starting
+temperature for each equivalence ratio and reactor pressure. Ignition was defined
+as a temperature rise greater than 150 K
+"""
 import cantera as ct
 import os
 import numpy as np

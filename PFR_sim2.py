@@ -1,3 +1,8 @@
+"""
+This code simulates a PFR undergoing nitrogen combustion with oxidizers of
+varying concentrations of radical species and diluents. Ignition delay
+for these oxidizers are then plotted for phi = 0.5, T = 1300 K, P = 1 atm
+"""
 import cantera as ct
 import os
 import numpy as np

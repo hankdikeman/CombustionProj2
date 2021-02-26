@@ -1,3 +1,7 @@
+"""
+This code simulates a CSTR reactor for various residence time and evaluates
+the presence of important pollutants such as NO and CO
+"""
 import cantera as ct
 import numpy as np
 import matplotlib.pyplot as plt
