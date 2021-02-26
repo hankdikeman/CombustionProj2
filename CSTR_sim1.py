@@ -71,18 +71,22 @@ species = ['CO', 'NO']
 
 if __name__ == '__main__':
     plt.figure(1)
-    plt.plot(residence_times, NO_conc, 'ro-', label='[NO]$_(SS)$')
+    plt.plot(residence_times, NO_conc, 'ro-', label='[NO]$_{SS}$')
     plt.title('NO Production as a Function of Residence Time')
     plt.legend(loc='upper right')
     plt.xlabel('time [s]')
     plt.yscale('log')
     plt.ylabel('mol fraction')
+    figname = 'Figures/Sim3/NOProd.png'
+    plt.savefig(figname)
     plt.show()
     plt.figure(2)
-    plt.plot(residence_times, CO_conc, 'bo-', label='[CO]$_(SS)$')
+    plt.plot(residence_times, CO_conc, 'bo-', label='[CO]$_{SS}$')
     plt.title('CO Production as a Function or Residence Time')
     plt.legend(loc='upper right')
     plt.xlabel('time [s]')
     plt.yscale('log')
+    figname = 'Figures/Sim3/COProd.png'
+    plt.savefig(figname)
     plt.ylabel('mol fraction')
     plt.show()

@@ -21,7 +21,7 @@ area = 1.e-4  # cross-sectional area [m**2]
 reaction_mechanism = os.path.join('data', 'ucsdmech.yaml')
 
 # Resolution: The PFR will be simulated by 'n_steps' time steps
-n_steps = 80000
+n_steps = 100000
 
 gas1 = ct.Solution(reaction_mechanism)
 gas1.TPX = T_0, pressure, composition_0
@@ -64,19 +64,20 @@ plt.xlabel('$t$ [s]')
 plt.ylabel('$T$ [K]')
 plt.title('Temperature with Respect to Time')
 plt.legend(loc=0)
+plt.xlim(0.002, 0.004)
 figname = 'Figures/Sim1/TemperatureZoomIn.png'
 plt.savefig(figname)
 plt.show(block=False)
 
 plt.figure()
 plt.plot(t1, states1.X[:, gas1.species_index('H2O')], 'g-',
-         label='H2O')
+         label='H$_2$O')
 plt.plot(t1, states1.X[:, gas1.species_index('CH4')], 'r-',
-         label='CH4')
+         label='CH$_4$')
 plt.plot(t1, states1.X[:, gas1.species_index('CO2')], 'b-',
-         label='CO2')
+         label='CO$_2$')
 plt.plot(t1, states1.X[:, gas1.species_index('O2')], 'm-',
-         label='O2')
+         label='O$_2$')
 plt.title('Major Species Concentrations with Respect to Time')
 plt.xlabel('Autoignition Delay $t$ [s]')
 plt.ylabel('$X$ [-]')
@@ -87,17 +88,18 @@ plt.show(block=False)
 
 plt.figure()
 plt.plot(t1, states1.X[:, gas1.species_index('H2O')], 'g-',
-         label='H2O')
+         label='H$_2$O')
 plt.plot(t1, states1.X[:, gas1.species_index('CH4')], 'r-',
-         label='CH4')
+         label='CH$_4$')
 plt.plot(t1, states1.X[:, gas1.species_index('CO2')], 'b-',
-         label='CO2')
+         label='CO$_2$')
 plt.plot(t1, states1.X[:, gas1.species_index('O2')], 'm-',
-         label='O2')
+         label='O$_2$')
 plt.title('Major Species Concentrations with Respect to Time')
 plt.xlabel('Autoignition Delay $t$ [s]')
 plt.ylabel('$X$ [-]')
 plt.legend(loc=0)
+plt.xlim(0.002, 0.004)
 figname = 'Figures/Sim1/MajorZoomIn.png'
 plt.savefig(figname)
 plt.show(block=False)
@@ -111,10 +113,43 @@ plt.plot(t1, states1.X[:, gas1.species_index('O')], 'm-',
          label='O')
 plt.title('Minor Species Concentrations with Respect to Time')
 plt.xlabel('Autoignition Delay $t$ [s]')
-plt.xlim(0.002, 0.004)
+plt.xlim(0.003, 0.00375)
 plt.ylabel('$X$ [-]')
 plt.legend(loc=0)
 figname = 'Figures/Sim1/MinorZoomIn.png'
+plt.savefig(figname)
+plt.show(block=False)
+
+plt.figure()
+plt.plot(t1, states1.X[:, gas1.species_index('H')], 'r-',
+         label='H')
+plt.plot(t1, states1.X[:, gas1.species_index('OH')], 'b-',
+         label='OH')
+plt.plot(t1, states1.X[:, gas1.species_index('O')], 'm-',
+         label='O')
+plt.title('Minor Species Concentrations with Respect to Time')
+plt.xlabel('Autoignition Delay $t$ [s]')
+plt.xlim(0.003, 0.00375)
+plt.yscale('log')
+plt.ylabel('$X$ [-]')
+plt.legend(loc=0)
+figname = 'Figures/Sim1/MinorZoomInLog.png'
+plt.savefig(figname)
+plt.show(block=False)
+
+plt.figure()
+plt.plot(t1, states1.X[:, gas1.species_index('H')], 'r-',
+         label='H')
+plt.plot(t1, states1.X[:, gas1.species_index('OH')], 'b-',
+         label='OH')
+plt.plot(t1, states1.X[:, gas1.species_index('O')], 'm-',
+         label='O')
+plt.title('Minor Species Concentrations with Respect to Time')
+plt.xlabel('Autoignition Delay $t$ [s]')
+plt.yscale('log')
+plt.ylabel('$X$ [-]')
+plt.legend(loc=0)
+figname = 'Figures/Sim1/MinorZoomOutLog.png'
 plt.savefig(figname)
 plt.show(block=False)
 
