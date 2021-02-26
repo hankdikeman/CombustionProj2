@@ -1,20 +1,23 @@
 import cantera as ct
 import numpy as np
 import matplotlib.pyplot as plt
-# create the gas mixture
+
+# create the gas mixture and composition arrays
 gas = ct.Solution('gri30.xml')
-residence_times = [np.power(x / 10, 2) for x in range(20)]
+residence_times = [np.power((x + 1) / 20, 2) for x in range(20)]
+print("res times:", residence_times)
 NO_conc = np.zeros_like(residence_times)
 CO_conc = np.zeros_like(residence_times)
 
 
-for t in residence_times:
-    # pressure = 60 Torr, T = 770 K
+for n, t in enumerate(residence_times):
+    print('res_time:', t)
+    # pressure = 60 Torr, T = 750 K
     p = ct.one_atm
-    t = 650
+    T = 750
     phi = 0.85
 
-    gas.TPX = t, p, {'CH4': phi, 'O2': 2 / phi, 'N2': 2 * 3.76 / phi}
+    gas.TPX = T, p, {'CH4': phi, 'O2': 2 / phi, 'N2': 2 * 3.76 / phi}
 
     # create an upstream reservoir that will supply the reactor. The temperature,
     # pressure, and composition of the upstream reservoir are set to those of the
@@ -24,14 +27,15 @@ for t in residence_times:
     # Now create the reactor object with the same initial state
     cstr = ct.IdealGasReactor(gas)
 
-    # Set its volume to 10 cm^3. In this problem, the reactor volume is fixed, so
+    # Set its volume to 1000 cm^3. In this problem, the reactor volume is fixed, so
     # the initial volume is the volume at all later times.
     cstr.volume = 1000.0 * 1.0e-6
 
     # Connect the upstream reservoir to the reactor with a mass flow controller
     # (constant mdot). Set the mass flow rate to 1.25 sccm.
-    res_time = 0.1
+    res_time = t
     mdot = res_time * cstr.volume * gas.density
+    print("mdot:", mdot, '\n')
     sccm = 1.25
     vdot = sccm * 1.0e-6 / 60.0 * \
         ((ct.one_atm / gas.P) * (gas.T / 273.15))  # m^3/s
@@ -44,29 +48,41 @@ for t in residence_times:
     # connect the reactor to the downstream reservoir with a valve, and set the
     # coefficient sufficiently large to keep the reactor pressure close to the
     # downstream pressure of 60 Torr.
-    v = ct.Valve(cstr, downstream, K=1.0e-9)
+    mfc = ct.MassFlowController(cstr, downstream, mdot=mdot)
+    # v = ct.Valve(cstr, downstream, K=1.0e-9)
 
     # create the network
     network = ct.ReactorNet([cstr])
 
     # now integrate in time
-    t = 0.0
-    dt = 0.01
+    time = 0.0
+    dt = 0.1
 
     states = ct.SolutionArray(gas, extra=['t'])
-    while t < 200.0:
-        t += dt
-        network.advance(t)
-        states.append(cstr.thermo.state, t=t)
+    while time < 400.0:
+        time += dt
+        network.advance(time)
+        states.append(cstr.thermo.state, t=time)
 
+    NO_conc[n] = states('NO').X[-1]
+    CO_conc[n] = states('CO').X[-1]
 
 species = ['CO', 'NO']
 
 if __name__ == '__main__':
     plt.figure(1)
-    for spc in species:
-        plt.plot(states.t, states(spc).Y, label=spc)
+    plt.plot(residence_times, NO_conc, 'ro-', label='[NO]$_(SS)$')
+    plt.title('NO Production as a Function of Residence Time')
     plt.legend(loc='upper right')
     plt.xlabel('time [s]')
-    plt.ylabel('mass fraction')
+    plt.yscale('log')
+    plt.ylabel('mol fraction')
+    plt.show()
+    plt.figure(2)
+    plt.plot(residence_times, CO_conc, 'bo-', label='[CO]$_(SS)$')
+    plt.title('CO Production as a Function or Residence Time')
+    plt.legend(loc='upper right')
+    plt.xlabel('time [s]')
+    plt.yscale('log')
+    plt.ylabel('mol fraction')
     plt.show()

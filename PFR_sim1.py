@@ -46,6 +46,7 @@ for pressure in init_pressure:
             sim1 = ct.ReactorNet([r1])
 
             # approximate a time step to achieve a similar resolution as in the next method
+
             dt = MAX_TIME / n_steps
             # define timesteps
             timesteps = (np.arange(n_steps) + 1) * dt
@@ -56,7 +57,7 @@ for pressure in init_pressure:
                 sim_time = t_i
                 # compute velocity and transform into space
                 # print(r1.thermo.state.T[0])
-                if(r1.thermo.state.T[0] > T_0 + 400):
+                if(r1.thermo.state.T[0] > T_0 + 150):
                     break
 
             # assign temps and equiv ratios to condition matrix
@@ -72,9 +73,18 @@ for pressure in init_pressure:
                  label='phi=' + str(phi))
     plt.title('Auto-Ignition Times at P = ' + str(pressure) + ' atm')
     plt.xlabel('$T$ [K]')
-    plt.ylabel('$t$ [s]')
+    plt.ylabel('Autoignition Delay $t$ [s]')
     plt.yscale('log')
-    plt.ylim(0.9E-4, 1.5E0)
+    plt.ylim(0.9E-4, 2.5E-1)
     plt.legend(loc=0)
     plt.grid(True, axis='y')
+    figname = 'Figures/Sim1/P' + str(pressure) + 'atm.png'
+    plt.savefig(figname)
     plt.show()
+
+
+composition_0 = {'CH4': 0.3, 'O2': 2 / 0.3, 'N2': 2 * 3.76 / 0.3}
+gas1 = ct.Solution(reaction_mechanism)
+gas1.TPX = 1300, ct.one_atm, composition_0
+gas1.equilibrate('HP')
+print(gas1.T)

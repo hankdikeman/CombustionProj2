@@ -54,6 +54,18 @@ plt.xlabel('$t$ [s]')
 plt.ylabel('$T$ [K]')
 plt.title('Temperature with Respect to Time')
 plt.legend(loc=0)
+figname = 'Figures/Sim1/TemperatureZoomOut.png'
+plt.savefig(figname)
+plt.show(block=False)
+
+plt.figure()
+plt.plot(t1, states1.T, label='Temperature')
+plt.xlabel('$t$ [s]')
+plt.ylabel('$T$ [K]')
+plt.title('Temperature with Respect to Time')
+plt.legend(loc=0)
+figname = 'Figures/Sim1/TemperatureZoomIn.png'
+plt.savefig(figname)
 plt.show(block=False)
 
 plt.figure()
@@ -66,9 +78,28 @@ plt.plot(t1, states1.X[:, gas1.species_index('CO2')], 'b-',
 plt.plot(t1, states1.X[:, gas1.species_index('O2')], 'm-',
          label='O2')
 plt.title('Major Species Concentrations with Respect to Time')
-plt.xlabel('$t$ [s]')
+plt.xlabel('Autoignition Delay $t$ [s]')
 plt.ylabel('$X$ [-]')
 plt.legend(loc=0)
+figname = 'Figures/Sim1/MajorZoomOut.png'
+plt.savefig(figname)
+plt.show(block=False)
+
+plt.figure()
+plt.plot(t1, states1.X[:, gas1.species_index('H2O')], 'g-',
+         label='H2O')
+plt.plot(t1, states1.X[:, gas1.species_index('CH4')], 'r-',
+         label='CH4')
+plt.plot(t1, states1.X[:, gas1.species_index('CO2')], 'b-',
+         label='CO2')
+plt.plot(t1, states1.X[:, gas1.species_index('O2')], 'm-',
+         label='O2')
+plt.title('Major Species Concentrations with Respect to Time')
+plt.xlabel('Autoignition Delay $t$ [s]')
+plt.ylabel('$X$ [-]')
+plt.legend(loc=0)
+figname = 'Figures/Sim1/MajorZoomIn.png'
+plt.savefig(figname)
 plt.show(block=False)
 
 plt.figure()
@@ -79,7 +110,25 @@ plt.plot(t1, states1.X[:, gas1.species_index('OH')], 'b-',
 plt.plot(t1, states1.X[:, gas1.species_index('O')], 'm-',
          label='O')
 plt.title('Minor Species Concentrations with Respect to Time')
-plt.xlabel('$t$ [s]')
+plt.xlabel('Autoignition Delay $t$ [s]')
+plt.xlim(0.002, 0.004)
 plt.ylabel('$X$ [-]')
 plt.legend(loc=0)
+figname = 'Figures/Sim1/MinorZoomIn.png'
+plt.savefig(figname)
+plt.show(block=False)
+
+plt.figure()
+plt.plot(t1, states1.X[:, gas1.species_index('H')], 'r-',
+         label='H')
+plt.plot(t1, states1.X[:, gas1.species_index('OH')], 'b-',
+         label='OH')
+plt.plot(t1, states1.X[:, gas1.species_index('O')], 'm-',
+         label='O')
+plt.title('Minor Species Concentrations with Respect to Time')
+plt.xlabel('Autoignition Delay $t$ [s]')
+plt.ylabel('$X$ [-]')
+plt.legend(loc=0)
+figname = 'Figures/Sim1/MinorZoomOut.png'
+plt.savefig(figname)
 plt.show()

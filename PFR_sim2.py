@@ -17,14 +17,14 @@ PHI = 0.5
 warnings.filterwarnings("ignore")
 
 
-init_temps = np.array([1200])
+init_temps = np.array([1300])
 init_pressure = np.array([1])
 init_phi = np.array(['air', 'oxygen', 'O radicals', 'OH radicals'])
 init_compositions = {
-    'air': {'CH4': PHI, 'O2': 2 / PHI, 'N2': 2 * 3.76 / PHI},
-    'oxygen': {'CH4': PHI, 'O2': 2 / PHI},
-    'O radicals': {'CH4': PHI, 'O2': 2 / PHI, 'N2': 0.79 / 0.207 * 2 / PHI, 'O': 0.003 / 0.207 * 2 / PHI},
-    'OH radicals': {'CH4': PHI, 'O2': 2 / PHI, 'N2': 0.79 / 0.207 * 2 / PHI, 'OH': 0.003 / 0.207 * 2 / PHI}
+    'air': {'CH4': 1, 'O2': 2 / PHI, 'N2': 2 * 3.76 / PHI},
+    'oxygen': {'CH4': 1, 'O2': 2 / PHI},
+    'O radicals': {'CH4': 1, 'O2': 2 / PHI, 'N2': 0.79 / 0.207 * 2 / PHI, 'O': 0.003 / 0.207 * 2 / PHI},
+    'OH radicals': {'CH4': 1, 'O2': 2 / PHI, 'N2': 0.79 / 0.207 * 2 / PHI, 'OH': 0.003 / 0.207 * 2 / PHI}
 }
 
 # store ignition times
@@ -64,12 +64,11 @@ for pressure in init_pressure:
                 sim_time = t_i
                 # compute velocity and transform into space
                 # print(r1.thermo.state.T[0])
-                if(r1.thermo.state.T[0] > T_0 + 400):
+                if(r1.thermo.state.T[0] > T_0 + 150):
                     break
 
             # assign temps and equiv ratios to condition matrix
             initial_temperatures[n_temp, n_phi] = T_0
-            # equiv_ratios[n_temp, n_phi] = phi
             ignition_times[n_temp, n_phi] = sim_time
             temp_count += 1
         phi_count += 1
@@ -77,11 +76,13 @@ for pressure in init_pressure:
     print(ignition_times)
     plt.figure()
     plt.bar([i for i, _ in enumerate(init_phi)],
-            ignition_times[0, :], color='gray')
+            ignition_times[0, :], color=plotcolors)
     plt.title('Auto-Ignition Times of Different Oxidizer Compositions')
-    plt.xlabel('$Oxidizer Species$ [-]')
-    plt.ylabel('$t$ [s]')
+    plt.xlabel('$Oxidizer Species$')
+    plt.ylabel('Autoignition Delay $t$ [s]')
     plt.legend(loc=0)
     plt.grid(True, axis='y')
     plt.xticks([i for i, _ in enumerate(init_phi)], init_phi)
+    figname = 'Figures/Sim2/P' + str(pressure) + 'atm.png'
+    plt.savefig(figname)
     plt.show()
