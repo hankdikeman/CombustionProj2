@@ -81,7 +81,7 @@ for pressure in init_pressure:
     print(ignition_times)
     plt.figure()
     plt.bar([i for i, _ in enumerate(init_phi)],
-            ignition_times[0, :], color=plotcolors)
+            ignition_times[0, :], color='blue')
     plt.title('Auto-Ignition Times of Different Oxidizer Compositions')
     plt.xlabel('$Oxidizer Species$')
     plt.ylabel('Autoignition Delay $t$ [s]')
