@@ -9,10 +9,12 @@ import matplotlib.pyplot as plt
 # create the gas mixture and composition arrays
 gas = ct.Solution('gri30.xml')
 gas2 = ct.Solution('gri30.xml')
-residence_times = [(x + 0.01) / 50 for x in range(500)]
+residence_times = [(x + 0.01) / 40 for x in range(500)]
 print("res times:", residence_times)
 NO_conc = np.zeros_like(residence_times)
 CO_conc = np.zeros_like(residence_times)
+
+phi = 0.85
 
 
 for n, t in enumerate(residence_times):
@@ -20,7 +22,6 @@ for n, t in enumerate(residence_times):
     # pressure = 60 Torr, T = 750 K
     p = ct.one_atm
     T = 650
-    phi = 0.85
 
     gas.TPX = T, p, {'CH4': phi, 'O2': 2 / phi, 'N2': 2 * 3.76 / phi}
     gas2.TPX = 2000, p, {'CH4': phi, 'O2': 2 / phi, 'N2': 2 * 3.76 / phi}
@@ -91,18 +92,18 @@ if __name__ == '__main__':
     plt.legend(loc='upper right')
     plt.xlabel('time [s]')
     # plt.yscale('log')
-    plt.ylabel('Normalized NO Concentration ([NO]/[NO]${eq}$)')
+    plt.ylabel('Normalized NO Concentration ([NO]/[NO]$_{eq}$)')
     plt.ylim(0, 1)
     figname = 'Figures/Sim3/NOProd.png'
     plt.savefig(figname)
     plt.show()
     plt.figure(2)
     plt.plot(residence_times, CO_conc / gas['CO'].X, 'b-', label='[CO]$_{SS}$')
-    plt.title('CO Production as a Function or Residence Time')
+    plt.title('CO Production as a Function of Residence Time')
     plt.legend(loc='upper right')
     plt.xlabel('time [s]')
+    plt.ylabel('Normalized CO Concentration ([CO]/[CO]$_{eq}$)')
     # plt.yscale('log')
     figname = 'Figures/Sim3/COProd.png'
     plt.savefig(figname)
-    plt.ylabel('Normalized CO Concentration ([CO]/[CO]${eq}$)')
     plt.show()
