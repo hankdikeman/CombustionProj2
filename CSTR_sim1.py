@@ -14,7 +14,7 @@ print("res times:", residence_times)
 NO_conc = np.zeros_like(residence_times)
 CO_conc = np.zeros_like(residence_times)
 
-phi = 0.85
+phi = 1
 
 
 for n, t in enumerate(residence_times):
